@@ -4,6 +4,10 @@ Casa dos nossos projetos para o [Omarchy](https://omarchy.org) com o
 [Herdr](https://github.com/herdrdev/herdr): Claude Code e Codex trabalhando lado a
 lado, com o Herdr como interface agêntica.
 
+**Por que existe:** o marketplace valida cada plugin isolado, mas não a relação entre
+eles (o que você já tem que faz o mesmo, o que conflita, o que depende de quê). O
+omonorepo é o normatizador disso. Ver [PRODUTO.md](PRODUTO.md).
+
 Cada plugin tem repositório próprio, porque o marketplace do Omarchy exige o
 `manifest.json` na raiz do repositório. Aqui eles entram como submódulos, junto
 com a documentação e a homologação de cada um.
