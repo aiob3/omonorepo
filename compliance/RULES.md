@@ -43,6 +43,7 @@ maintainer must review it. Two rules block publication outright.
 | C1 | The plugin never changes user configuration without an explicit user action: `shell.json`, `bindings.lua`, bar placement, the default agent | [form] | review (lists every write) |
 | C2 | No agent or tool binary is run just to inspect it; Omarchy first-run stubs install when run | [ours] | review |
 | C3 | Launching agents in approval-skipping modes is stated plainly in the README | [ours] | auto (text) |
+| K1 | Every key the README tells users to bind is free on a stock Omarchy, unless the README frees it first with `hl.unbind`. Checked against the live Hyprland bindings with omaplug's own conflict logic (`plugins/omaplug/shortcut.py`) | [ours] (Super+Ctrl+Shift+G opened Google Messages too) | auto |
 
 ## Documentation
 

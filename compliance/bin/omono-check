@@ -128,6 +128,10 @@ else
   pass C3 "no approval-skipping flags"
 fi
 
+k=$(python3 "$repo/compliance/bin/key-conflicts.py" "$plugin" "$(jq -r .id "$manifest")" 2>&1)
+if [[ $? == 0 ]]; then pass K1 "keys in the README collide with no live Hyprland binding (omaplug's check)"
+else fail K1 "keys in the README already bound on this system:"; while IFS= read -r l; do detail "$l"; done <<<"$k"; fi
+
 echo
 echo "Documentation"
 missing=""
