@@ -71,5 +71,15 @@ user's.
 |---|---|
 | Installed from zero on a reinstalled Omarchy | done (table above) |
 | omany lists `lion` as installed | done |
-| A slot set to `lion` opens it in a new Herdr tab, in `~/Work`, in the user's session | pending: operator test |
-| A second press opens another tab, not another window | pending: operator test |
+| Slot X set to `lion` through the panel's searchable picker (typing "li") | accepted, 2026-09-26 02:05 |
+| It opens in a new Herdr tab of the user's `sistema` session, in `~/Work` | accepted: omany log `ok: lion in wY:p1 (plain command: lion)` at 02:04:41 |
+| LionTUI boots and checks its providers | accepted: "2 de 5 prontos para usar" (Claude with subscription, Codex) |
+| A second press opens another tab, not another window | not tested yet |
+
+Observed along the way:
+
+- On first run in `~/Work`, LionTUI offered `git init`; the operator accepted, and
+  `~/Work` became a git repository (branch `master`, no commits). Herdr then shows
+  the branch under the workspace.
+- Herdr listed the LionTUI tab as a `claude` agent while LionTUI ran its Claude
+  provider, since it detects the Claude SDK process inside the tab.
