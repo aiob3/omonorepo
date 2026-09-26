@@ -1,0 +1,6 @@
+[submodule "plugins/omaplug"]
+	path = plugins/omaplug
+	url = https://github.com/aiob3/omaplug.git
+[submodule "plugins/omany"]
+	path = plugins/omany
+	url = https://github.com/aiob3/omany.git
