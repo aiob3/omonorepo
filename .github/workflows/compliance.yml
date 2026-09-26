@@ -1,0 +1,38 @@
+name: compliance
+
+# Runs the compliance rules (compliance/RULES.md) on every plugin of the series,
+# that is, every plugin with a docs/<plugin>/listing.json. Forks we only carry, such
+# as omaplug, have no listing and are not checked here.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  omono-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq imagemagick file >/dev/null
+
+      - name: Tags for the plugin submodules
+        run: git submodule foreach --quiet 'git fetch --quiet --tags || true'
+
+      - name: omono-check on every plugin of the series
+        run: |
+          status=0
+          for listing in docs/*/listing.json; do
+            name=$(basename "$(dirname "$listing")")
+            compliance/bin/omono-check --ci "plugins/$name" || status=1
+            echo
+          done
+          exit $status
