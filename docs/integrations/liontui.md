@@ -8,6 +8,22 @@ zero on a freshly reinstalled Omarchy and opening it through omany.
 The LionTUI repository is private to the LionLabs community; installing it needs an
 account with access.
 
+This is a community validation record, not an official LionLabs or Omarchy
+certification.
+
+## Fixed set
+
+| Item | Value |
+|---|---|
+| LionTUI revision | `be50155e1b1207abf72781caf19da95bc1757aa1` (v1.0.0) |
+| Omarchy | 4.0.4-1, x86_64, kernel 7.2.5-3-omarchy |
+| Hyprland | v0.56.2 |
+| Herdr | 0.8.2 |
+| Node / npm | 26.7.0 / 11.19.0, via mise |
+| omany | 0.10.2 (with LionTUI support, commit `4880ed4`) |
+| `package.json` SHA-256 | `ad7b6742a058d4c8af489f69b9ad835c161a913a03c633c3a06e42ec68a18eeb` |
+| `package-lock.json` SHA-256 (official) | `be74f1f53f9789d821887e8e66a24435987e11b3b5476117d1f2feeafba21c1d` |
+
 ## Starting point
 
 Omarchy reinstalled on 2026-09-25 (factory reset). Before step 1: no `lion` command,
@@ -26,6 +42,16 @@ no copy of the repository under `/data`, Node 26.7.0 from mise (LionTUI needs
 
 Step 5 is not in LionTUI's README: it only shows up on a fresh Omarchy, where the
 desktop shell, not an interactive terminal, starts the agent.
+
+## Findings for the LionTUI maintainers
+
+1. **`mise reshim` on Omarchy.** With Node from mise (Omarchy's default), `npm link`
+   puts `lion` where interactive shells find it but the desktop shell does not.
+   Adding `mise reshim` to the install steps fixes it.
+2. **Lockfile version.** In v1.0 `package.json` says `1.0.0` and `package-lock.json`
+   says `0.1.0`, so `npm install` (the README's command) rewrites the lockfile's two
+   version fields. No dependency changes. The official lockfile was restored after
+   the install, and no versioned file of the repository was left modified.
 
 ## Opening it through omany
 
