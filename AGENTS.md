@@ -41,6 +41,10 @@ turn).
 5. **Only with the operator's explicit go:** make the repositories public, run the
    marketplace steps (validate, install from the public URL, submission issue) and
    follow up until the listing is verified.
+6. **While a submission waits for approval,** the marketplace validation is bound to
+   one commit, and a different commit at approval time blocks publication. After
+   pushing to the plugin, edit the submission issue so the bot validates the new
+   HEAD, and confirm both reports name that commit.
 
 ## Rules that are easy to break
 
