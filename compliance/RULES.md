@@ -44,6 +44,7 @@ maintainer must review it. Two rules block publication outright.
 | C2 | No agent or tool binary is run just to inspect it; Omarchy first-run stubs install when run | [ours] | review |
 | C3 | Launching agents in approval-skipping modes is stated plainly in the README | [ours] | auto (text) |
 | K1 | Every key the README tells users to bind is free on a stock Omarchy, unless the README frees it first with `hl.unbind`. Checked against the live Hyprland bindings with omaplug's own conflict logic (`plugins/omaplug/shortcut.py`) | [ours] (Super+Ctrl+Shift+G opened Google Messages too) | auto |
+| K2 | Prefer letters terminals and agent TUIs do not use with Ctrl (avoid P, N, R, L, U, W, K, A, E, D). A combination Hyprland does not catch reaches the focused app: Super+Ctrl+Shift+P recalled the previous prompt, like Ctrl+P | [ours] | review |
 
 ## Documentation
 

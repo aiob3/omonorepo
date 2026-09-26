@@ -19,6 +19,15 @@ and Herdr's state. No automated tests.
 | Settings: position, workspace, folder with Save, skill | accepted |
 | Reset to a fresh install, confirmed with two clicks | accepted |
 
+## Keys
+
+Every Super+Ctrl+Shift letter was pressed on 2026-09-26. Only omany's keys answered
+(A, Z, S, X, and C bound to Copilot); the other free letters did nothing, except P:
+Hyprland does not catch it, so the focused agent received it as Ctrl+P and recalled
+the previous prompt. Super+Ctrl+Shift+G, used in an early README example, also opened
+Google Messages (an Omarchy default); the example moved to C and O, and rule K1 now
+catches that kind of conflict.
+
 ## Agents
 
 | Agent | Launches logged | Status |
