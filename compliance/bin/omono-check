@@ -94,8 +94,9 @@ elif [[ $same != yes ]]; then fail M4 "manifest tags and listing.json tags diffe
 else pass M4 "tags: $(tr '\n' ' ' <<<"$manifest_tags")"; fi
 
 if [[ -f $plugin/preview.png ]]; then
-  identify_cmd=(identify); command -v magick >/dev/null && identify_cmd=(magick identify)
-  read -r w h < <("${identify_cmd[@]}" -format '%w %h' "$plugin/preview.png" 2>/dev/null)
+  # Width and height from the PNG header, so no image tool is needed (CI runners have none).
+  read -r w h < <(python3 -c 'import struct, sys; d = open(sys.argv[1], "rb").read(24); print(*struct.unpack(">II", d[16:24]) if d[:8] == b"\x89PNG\r\n\x1a\n" else (0, 0))' "$plugin/preview.png" 2>/dev/null)
+  w=${w:-0}; h=${h:-1}
   ratio=$(awk -v w="$w" -v h="$h" 'BEGIN { r = w / h; if (r > 1.74 && r < 1.8) print "16:9"; else if (r > 1.3 && r < 1.36) print "4:3"; else print "other" }')
   if ((w >= 1200)) && [[ $ratio != other ]]; then pass M5 "preview.png ${w}x${h} ($ratio)"
   else fail M5 "preview.png ${w}x${h}: needs at least 1200 px wide, 16:9 or 4:3"; fi
