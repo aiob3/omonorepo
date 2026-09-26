@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/aiob3/omany",
+  "category": "Developer Tools",
+  "tags": ["ai", "workspaces", "launcher"],
+  "description": "Every AI agent opens the same way: inside Herdr, one tab per agent, four key slots, and the Omarchy skill loaded on the first turn.",
+  "maintainerNotes": "Requires Herdr (herdr on PATH), jq and Omarchy's default agent. Launches agents with the same approval-skipping flags as `omarchy agent` (stated in the README). No sudo, no services, no downloads. It only writes its own settings through `omarchy bar set`, a log in ~/.local/state/omany.log, and moves its bar icon only when the user changes Position. Key bindings are added by the user, following the README."
+}
