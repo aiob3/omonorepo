@@ -1,7 +1,9 @@
 # LionTUI and LionClaw Desktop on Omarchy: two onboarding paths
 
 The LionLabs community ships two front doors, and they land on Omarchy differently.
-This record compares them as observed on one station, validated together with the
+Each path keeps its own record: the Desktop homologation lives with its installer
+([HOMOLOGACAO.md](https://github.com/aiob3/lionclaw-omarchy/blob/main/HOMOLOGACAO.md)),
+where the community publication started; LionTUI's lives here. This page only compares them as observed on one station, validated together with the
 operator on 2026-09-26. It is a community validation record, not an official
 LionLabs or Omarchy certification.
 
@@ -77,4 +79,4 @@ persona.
 | LionTUI through omany, in `~/Work` | accepted (see [liontui.md](liontui.md)) |
 | LionClaw 3.9.0 production build from the menu, native Wayland | accepted: window `LionClaw`, `xwayland: false`, started by the user session, chat answered |
 | Dictation in the Desktop, development build | accepted by the operator |
-| Dictation in the Desktop, production build from the menu | NOT VERIFIED |
+| Dictation in the Desktop, production build from the menu | accepted by the operator |
