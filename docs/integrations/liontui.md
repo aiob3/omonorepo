@@ -30,6 +30,33 @@ Omarchy reinstalled on 2026-09-25 (factory reset). Before step 1: no `lion` comm
 no copy of the repository under `/data`, Node 26.7.0 from mise (LionTUI needs
 22.19 or newer), Herdr 0.8.2, omany 0.10.2.
 
+## Why this integration matters
+
+LionTUI is part of the LionLabs community's method of systemic execution: one agent,
+one conversation, five providers behind it. Its job in the community is inclusion:
+it is the entry point for collaborators who are less familiar with code, who should
+not have to learn five different agent tools before doing useful work.
+
+Omarchy, with omany, gives that entry point a friendly place to live. A key or a
+click in the bar opens LionTUI in a tab, in the same place as every other agent, with
+the same rules. The community authorized this integration to bring LionTUI into this
+ecosystem as its onboarding path.
+
+## Onboarding
+
+For a new collaborator, the first session is three steps:
+
+1. **Install LionTUI once** (below), including `mise reshim`.
+2. **Pick `lion` for a slot** in the omany panel: open the slot's picker, type `li`,
+   choose `lion`. From then on one key opens it.
+3. **Answer the git question for the place you are in.** In a folder without git,
+   LionTUI offers `git init` for checkpoints and `/undo`. omany shows a notice the
+   first time:
+   - in `~/Work`, the agents' home folder, answer **N** (its default). It is not a
+     project, and versioning it would record the system's own files. LionTUI works
+     normally without it;
+   - for work you want to undo, open LionTUI in a project folder that already uses git.
+
 ## Installation, as run on 2026-09-26
 
 | Step | Command | Result |
@@ -48,7 +75,10 @@ desktop shell, not an interactive terminal, starts the agent.
 1. **`mise reshim` on Omarchy.** With Node from mise (Omarchy's default), `npm link`
    puts `lion` where interactive shells find it but the desktop shell does not.
    Adding `mise reshim` to the install steps fixes it.
-2. **Lockfile version.** In v1.0 `package.json` says `1.0.0` and `package-lock.json`
+2. **A way to skip the git question.** In a shared, non-project folder the question
+   has only one right answer. An option such as `LION_NO_GIT_PROMPT=1` (or a flag)
+   would let launchers like omany start LionTUI without asking.
+3. **Lockfile version.** In v1.0 `package.json` says `1.0.0` and `package-lock.json`
    says `0.1.0`, so `npm install` (the README's command) rewrites the lockfile's two
    version fields. No dependency changes. The official lockfile was restored after
    the install, and no versioned file of the repository was left modified.
@@ -79,7 +109,10 @@ user's.
 Observed along the way:
 
 - On first run in `~/Work`, LionTUI offered `git init`; the operator accepted, and
-  `~/Work` became a git repository (branch `master`, no commits). Herdr then shows
-  the branch under the workspace.
+  `~/Work` became a git repository (branch `master`, no commits). Checked impact: the
+  memory mirror and Codex's folder trust were unaffected, but Claude Code, Codex and
+  Herdr started treating the agents' home folder as a project, and a `git add -A`
+  there would have versioned the system's own files. The empty repository was
+  removed, and the onboarding above now says to answer N there.
 - Herdr listed the LionTUI tab as a `claude` agent while LionTUI ran its Claude
   provider, since it detects the Claude SDK process inside the tab.

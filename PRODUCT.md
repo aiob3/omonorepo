@@ -69,6 +69,17 @@ Next steps on this front: show when another agent plugin is already installed an
 what it does in common with omany, and unify how the default agent is chosen across
 Omarchy and plugins.
 
+## Inclusion: an entry point for communities
+
+Normalizing agents also lowers the bar to start. When every agent opens the same way,
+from one key or one click, a community can hand new collaborators a single, friendly
+path into AI-assisted work instead of a stack of tools to learn.
+
+The first case is the LionLabs community's **LionTUI**, one agent in front of five
+providers and the community's entry point for people less familiar with code. With
+the community's authorization, omany opens it like any other agent, and omonorepo
+documents its onboarding end to end (`docs/integrations/liontui.md`).
+
 ## Relationship with omaplug
 
 omaplug (our fork of the plugin manager) already handles key conflicts when it
