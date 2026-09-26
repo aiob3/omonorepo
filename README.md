@@ -40,7 +40,7 @@ For people who **use** plugins, it maps what is installed and proposes a coheren
 
 We start with **AI agents**, the family with the least consistency today: every tool
 opens agents its own way, the Herdr plugins only watch, and installers switch your
-default agent without asking. Details (in Portuguese) in [PRODUTO.md](PRODUTO.md).
+default agent without asking. Details in [PRODUCT.md](PRODUCT.md).
 
 ### The series
 
@@ -54,7 +54,7 @@ root) and joins this one as a submodule, with its docs and acceptance record.
 
 #### omany at a glance
 
-![omany panel next to Herdr](docs/omany/homologacao/preview.png)
+![omany panel next to Herdr](docs/omany/acceptance/preview.png)
 
 | Key | Opens |
 |---|---|
@@ -62,8 +62,8 @@ root) and joins this one as a submodule, with its docs and acceptance record.
 | Super+Ctrl+Shift+Z | the other one (Codex) |
 | Super+Ctrl+Shift+S / X | free slots, picked in the panel |
 
-Tested in real use on 2026-09-25 and 26; the acceptance record (in Portuguese) is in
-[docs/omany/homologacao](docs/omany/homologacao/README.md).
+Tested in real use on 2026-09-25 and 26; the acceptance record is in
+[docs/omany/acceptance](docs/omany/acceptance/README.md).
 
 ### Clone
 
@@ -108,7 +108,7 @@ nossas de estabilidade, e confere cada plugin da série antes de publicar. Para 
 
 Começamos pelos **agentes**, a família com menos uniformidade hoje: cada ferramenta
 abre o agente de um jeito, os plugins do Herdr só observam, e os instaladores trocam o
-agente padrão sem avisar. O detalhe está em [PRODUTO.md](PRODUTO.md).
+agente padrão sem avisar. O detalhe (em inglês) está em [PRODUCT.md](PRODUCT.md).
 
 ### A série
 
@@ -117,8 +117,8 @@ agente padrão sem avisar. O detalhe está em [PRODUTO.md](PRODUTO.md).
 | **omany** (1º da série) | Uniformiza os agentes: todos abrem no Herdr, uma aba por agente, quatro vagas previsíveis e o skill do Omarchy no primeiro turno | [aiob3/omany](https://github.com/aiob3/omany) |
 | **omaplug** | Gerenciador de plugins do Omarchy (nosso fork); onde o usuário vê conflitos de tecla e, em seguida, entre plugins ativos | [aiob3/omaplug](https://github.com/aiob3/omaplug) |
 
-A homologação do omany, feita no uso real em 25 e 26/09/2026, está em
-[docs/omany/homologacao](docs/omany/homologacao/README.md).
+A homologação do omany (em inglês), feita no uso real em 25 e 26/09/2026, está em
+[docs/omany/acceptance](docs/omany/acceptance/README.md).
 
 ### Como clonar
 
