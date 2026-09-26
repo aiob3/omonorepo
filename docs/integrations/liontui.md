@@ -11,6 +11,8 @@ account with access.
 This is a community validation record, not an official LionLabs or Omarchy
 certification.
 
+How this path differs from LionClaw Desktop: [lion-onboarding.md](lion-onboarding.md).
+
 ## Fixed set
 
 | Item | Value |
