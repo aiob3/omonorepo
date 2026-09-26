@@ -1,39 +1,39 @@
-# Homologação do omany
+# omany acceptance record
 
-Feita no uso real, em 25 e 26/09/2026, numa estação Omarchy com Hyprland 0.56,
-Herdr 0.8.2, Claude Code 2.1.283 e Codex 0.157. Regra do teste: o operador aperta
-a tecla ou clica, e o assistente confirma pelo log (`~/.local/state/omany.log`) e
-pelo estado do Herdr. Nada de teste automático.
+Done in real use on 2026-09-25 and 26, on an Omarchy workstation with Hyprland 0.56,
+Herdr 0.8.2, Claude Code 2.1.283 and Codex 0.157. Test rule: the operator presses the
+key or clicks, and the assistant confirms through the log (`~/.local/state/omany.log`)
+and Herdr's state. No automated tests.
 
-## O que foi homologado
+## What was accepted
 
-| Recurso | Resultado |
+| Feature | Result |
 |---|---|
-| Super+Ctrl+Shift+A abre o agente padrão no Herdr, aba nova a cada tecla, uma janela só | aprovado |
-| Super+Ctrl+Shift+Z abre o outro agente (Claude Code ↔ Codex) | aprovado |
-| Super+Ctrl+Shift+S / X abrem os agentes escolhidos para as vagas | aprovado (Copilot, Grok) |
-| Vaga vazia avisa e não abre nada | aprovado |
-| Skill do Omarchy no primeiro turno (`/omarchy` no Claude, `$omarchy` no Codex) | aprovado |
-| Ícone na barra, logo depois do relógio | aprovado |
-| Painel: vagas com seletor, Open, agentes rodando com Focus, instalados | aprovado |
-| Configurações: posição, workspace, pasta com Save, skill | aprovado |
-| Reset para instalação nova, com confirmação em dois cliques | aprovado |
+| Super+Ctrl+Shift+A opens the default agent in Herdr, a new tab per press, a single window | accepted |
+| Super+Ctrl+Shift+Z opens the other agent (Claude Code ↔ Codex) | accepted |
+| Super+Ctrl+Shift+S / X open the agents picked for the slots | accepted (Copilot, Grok) |
+| An empty slot warns and opens nothing | accepted |
+| Omarchy skill on the first turn (`/omarchy` in Claude Code, `$omarchy` in Codex) | accepted |
+| Bar icon, right after the clock | accepted |
+| Panel: slots with a picker, Open, running agents with Focus, installed agents | accepted |
+| Settings: position, workspace, folder with Save, skill | accepted |
+| Reset to a fresh install, confirmed with two clicks | accepted |
 
-## Problemas encontrados e corrigidos no caminho
+## Problems found and fixed along the way
 
-- **Janela avulsa:** o atalho original do Omarchy abria o agente fora do Herdr.
-- **Enter do Codex:** o `$` abre o menu de skills e o primeiro Enter só escolhe o item.
-- **Partida a frio:** com o servidor do Herdr desligado, a janela precisa abrir antes dos comandos.
-- **Ícone invisível:** o widget sem `implicitWidth` ficava com largura zero na barra.
-- **"File name case mismatch":** cache de diretório do Qt; resolve com `omarchy restart shell`.
-- **Plugin "ativo" sem ícone:** entrada residual em `plugins[]` do `shell.json`.
-- **Agentes que o Herdr não reconhece** (OpenClaw, Crush, Muse): abrem como comando comum numa aba.
-- **Stubs de instalação:** alguns agentes instalam no primeiro uso; o painel lê o arquivo e nunca executa.
-- **Grok sem nome:** uma nova tentativa encontrava o agente já rodando; agora ele só recebe o nome.
-- **Viés do Omarchy:** instalar um agente pelo menu o torna o padrão; a vaga A do omany pode ficar independente.
+- **Loose window:** Omarchy's original key opened the agent outside Herdr.
+- **Codex Enter:** `$` opens the skill menu, and the first Enter only picks the item.
+- **Cold start:** with the Herdr server stopped, the window must open before any command.
+- **Invisible icon:** without `implicitWidth` the widget had zero width on the bar.
+- **"File name case mismatch":** Qt's directory cache; `omarchy restart shell` clears it.
+- **Plugin "enabled" but no icon:** a leftover `plugins[]` entry in `shell.json`.
+- **Agents Herdr cannot recognize** (OpenClaw, Crush, Muse): they open as a plain command in a tab.
+- **First-run installer stubs:** some agents install on first run; the panel reads the file and never runs it.
+- **Unnamed Grok:** a retry found the agent already running; now it only gets its name.
+- **Omarchy's default-agent bias:** installing an agent from the menu makes it the default; omany's slot A can stay independent.
 
-## Prints
+## Screenshots
 
-| Prévia | Painel | Configurações | Herdr |
+| Preview | Panel | Settings | Herdr |
 |---|---|---|---|
 | ![](preview.png) | ![](panel.png) | ![](settings.png) | ![](herdr.png) |
