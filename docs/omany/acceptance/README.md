@@ -37,6 +37,7 @@ catches that kind of conflict.
 | GitHub Copilot CLI | 9 | accepted |
 | Grok | 1 | accepted (unnamed-on-retry fixed in 0.9.0) |
 | OpenCode | 3 | opens; OpenCode itself stopped during its own startup (outside omany) |
+| LionTUI (LionLabs community) | 1 | accepted as a plain command; see docs/integrations/liontui.md |
 | Gemini, Cursor Agent, Hermes, OMP, Pi, OpenClaw, Crush, Muse | 0 | supported, not tested yet |
 
 ## Problems found and fixed along the way
