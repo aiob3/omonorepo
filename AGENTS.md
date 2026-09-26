@@ -21,9 +21,10 @@ turn).
 - All documentation is in **English**, end to end: README files, PRODUCT.md,
   acceptance records, compliance rules, code comments, commit messages. English
   leaves no room for ambiguity, for people and for agents.
-- The only Portuguese text is the closing section of this repository's README, which
-  marks the project as made in Brazil. Keep the language links and "Made in Brazil"
-  line at the top of that README.
+- The only Portuguese text is the closing section of a README (this repository's and
+  each plugin's main page), after `<a id="tupiniquim"></a>`, marking the work as made
+  in Brazil. The README's first line after the title is always
+  `🇺🇸 English | 🇧🇷 Tupiniquim`, linking to both sections.
 
 ## How work moves from idea to marketplace
 

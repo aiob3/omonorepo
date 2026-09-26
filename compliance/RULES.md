@@ -50,7 +50,7 @@ maintainer must review it. Two rules block publication outright.
 |---|---|---|---|
 | D1 | README sections: requirements, install, remove, how it works, what it writes, troubleshooting | [top] | auto (headings) |
 | D2 | Removal covers every file the plugin leaves behind | [top] [form] | review |
-| D3 | All documentation is in English | [ours] | auto (heuristic) |
+| D3 | All documentation is in English; a README may close with a Portuguese section after `<a id="tupiniquim"></a>`, announced in its first line as `🇺🇸 English \| 🇧🇷 Tupiniquim` | [ours] | auto (heuristic) |
 | D4 | Third-party assets (icons, fonts) are credited with their license | [form] | review |
 
 ## Hygiene

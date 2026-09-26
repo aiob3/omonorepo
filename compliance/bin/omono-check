@@ -141,7 +141,13 @@ heading 'what it writes|files it|what it touches' || missing+=" what-it-writes"
 heading 'troubleshoot|something goes wrong|if .* wrong' || missing+=" troubleshooting"
 [[ -z $missing ]] && pass D1 "README has every required section" || fail D1 "README is missing sections:$missing"
 review D2 "removal instructions cover every file the plugin leaves behind"
-pt=$(cd "$plugin" && files | grep -E '\.(md|qml|sh|js|py)$|^bin/' | xargs -r grep -ciE '\b(não|você|também|então|para o|está)\b' 2>/dev/null | awk -F: '$2 > 0' )
+# READMEs may close with a Portuguese section after <a id="tupiniquim">; only the
+# text before that anchor counts.
+english_only() { if [[ $1 == *README.md ]]; then sed '/id="tupiniquim"/,$d' "$1"; else cat "$1"; fi; }
+pt=$(cd "$plugin" && files | grep -E '\.(md|qml|sh|js|py)$|^bin/' | while read -r f; do
+  n=$(english_only "$f" | grep -ciE '\b(não|você|também|então|para o|está)\b')
+  ((n > 0)) && echo "$f:$n"
+done)
 [[ -z $pt ]] && pass D3 "documentation and comments are in English" || { fail D3 "Portuguese found:"; detail $pt; }
 review D4 "third-party assets are credited with their license"
 

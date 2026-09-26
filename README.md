@@ -1,6 +1,6 @@
 # omonorepo
 
-**🇺🇸 [English](#english) · 🇧🇷 [Português](#portugues)**
+**🇺🇸 [English](#english) | 🇧🇷 [Tupiniquim](#tupiniquim)**
 
 *Made in Brazil 🇧🇷 · Feito no Brasil*
 
@@ -73,9 +73,9 @@ git clone --recurse-submodules https://github.com/aiob3/omonorepo.git
 
 ---
 
-<a id="portugues"></a>
+<a id="tupiniquim"></a>
 
-## Português
+## 🇧🇷 Tupiniquim
 
 **Uma solução brasileira.** O normatizador dos plugins do Omarchy: diz ao usuário o
 que ele já tem, o que conflita e do que cada coisa depende.
