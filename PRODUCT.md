@@ -42,6 +42,16 @@ It works on two fronts:
 - **For users (normalization):** read the installed plugins, map overlaps, conflicts
   and dependencies, and propose a coherent setup.
 
+## What we are not
+
+omonorepo does **not** compete with the marketplace or with the community's curated
+lists (awesome-omarchy and others). They answer *what exists*; we answer *how it fits
+with what you already have*. The goal is to break a vicious cycle: today every plugin
+arrives without any check against what is already installed, starting with what
+Omarchy ships by default. Once a family is normalized, everything that comes after
+it is checked against that baseline first. Where it helps, we contribute back to the
+existing lists instead of creating a rival one.
+
 ## Where we start: AI agents
 
 Agents are the family where the lack of consistency hurts the most. Every tool opens

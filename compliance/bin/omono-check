@@ -1,0 +1,159 @@
+#!/bin/bash
+# omono-check <plugin-dir>: run the omonorepo compliance rules (compliance/RULES.md)
+# against one plugin. Prints PASS / FAIL / REVIEW per rule. Exit status = number of
+# FAILs. REVIEW items need a person to confirm and do not count as failures.
+
+set -uo pipefail
+
+plugin=$(readlink -f "${1:?usage: omono-check <plugin-dir>}")
+repo=$(readlink -f "$(dirname "$0")/../..")
+name=$(basename "$plugin")
+listing="$repo/docs/$name/listing.json"
+manifest="$plugin/manifest.json"
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/omonorepo"
+form_url="https://raw.githubusercontent.com/omacom/omarchy-plugin-marketplace/HEAD/.github/ISSUE_TEMPLATE/submit-plugin.yml"
+mkdir -p "$cache"
+
+fails=0
+reviews=0
+pass() { printf '  \e[32mPASS\e[0m   %-3s %s\n' "$1" "$2"; }
+fail() { printf '  \e[31mFAIL\e[0m   %-3s %s\n' "$1" "$2"; fails=$((fails + 1)); }
+review() { printf '  \e[33mREVIEW\e[0m %-3s %s\n' "$1" "$2"; reviews=$((reviews + 1)); }
+detail() { printf '             %s\n' "$@"; }
+
+# Plugin files only: no .git, no binary assets.
+files() { git -C "$plugin" ls-files | grep -vE '\.(png|jpg|jpeg|webp|gif|svg)$'; }
+grep_plugin() { (cd "$plugin" && files | xargs -r grep -nIE "$@" 2>/dev/null); }
+
+# Official category and tag lists, live from the submission form, cached for offline use.
+if curl -fsS --max-time 10 "$form_url" -o "$cache/submit-plugin.yml.new" 2>/dev/null; then
+  mv "$cache/submit-plugin.yml.new" "$cache/submit-plugin.yml"
+fi
+form_list() { # label -> its options, one per line
+  awk -v want="$1" '
+    /label:/ { sub(/.*label: */, ""); current = $0 }
+    /options:/ { collect = (current == want); next }
+    collect && /^ *- / { sub(/^ *- */, ""); print; next }
+    collect && !/^ *- / { collect = 0 }
+  ' "$cache/submit-plugin.yml" 2>/dev/null
+}
+categories=$(form_list "Category")
+tags_allowed=$(form_list "Tags")
+
+echo "omono-check: $name"
+echo
+
+echo "Marketplace listing"
+if out=$(omarchy plugin validate "$plugin" 2>&1); then pass M1 "omarchy plugin validate"; else fail M1 "omarchy plugin validate: $out"; fi
+
+missing=""
+for f in manifest.json README.md LICENSE; do [[ -f $plugin/$f ]] || missing+=" $f"; done
+[[ -z $missing ]] && pass M2 "manifest.json, README.md and LICENSE at the root" || fail M2 "missing:$missing"
+
+if [[ ! -f $listing ]]; then
+  fail M3 "no listing file: docs/$name/listing.json (category, tags, description, maintainerNotes)"
+else
+  category=$(jq -r '.category // empty' "$listing")
+  if [[ -z $categories ]]; then review M3 "category '$category' (could not read the official list)"
+  elif grep -qxF "$category" <<<"$categories"; then pass M3 "category: $category"
+  else fail M3 "category '$category' is not one of: $(tr '\n' ',' <<<"$categories" | sed 's/,$//')"; fi
+fi
+
+manifest_tags=$(jq -r '.tags[]? // empty' "$manifest")
+listing_tags=$([[ -f $listing ]] && jq -r '.tags[]? // empty' "$listing")
+bad=""
+count=0
+while IFS= read -r t; do
+  [[ -z $t ]] && continue
+  count=$((count + 1))
+  grep -qixF "$t" <<<"$tags_allowed" || bad+=" $t"
+done <<<"$manifest_tags"
+same=$([[ $(sort -f <<<"$manifest_tags" | tr 'A-Z' 'a-z') == $(sort -f <<<"$listing_tags" | tr 'A-Z' 'a-z') ]] && echo yes)
+if ((count < 1 || count > 3)); then fail M4 "$count manifest tags; the form accepts 1 to 3"
+elif [[ -n $bad ]]; then fail M4 "tags not in the official list:$bad (allowed: $(tr '\n' ',' <<<"$tags_allowed" | sed 's/,$//'))"
+elif [[ $same != yes ]]; then fail M4 "manifest tags and listing.json tags differ"
+else pass M4 "tags: $(tr '\n' ' ' <<<"$manifest_tags")"; fi
+
+if [[ -f $plugin/preview.png ]]; then
+  read -r w h < <(magick identify -format '%w %h' "$plugin/preview.png" 2>/dev/null)
+  ratio=$(awk -v w="$w" -v h="$h" 'BEGIN { r = w / h; if (r > 1.74 && r < 1.8) print "16:9"; else if (r > 1.3 && r < 1.36) print "4:3"; else print "other" }')
+  if ((w >= 1200)) && [[ $ratio != other ]]; then pass M5 "preview.png ${w}x${h} ($ratio)"
+  else fail M5 "preview.png ${w}x${h}: needs at least 1200 px wide, 16:9 or 4:3"; fi
+else
+  fail M5 "no preview.png at the root"
+fi
+
+if [[ -f $listing ]]; then
+  desc=$(jq -r '.description // empty' "$listing")
+  if [[ -z $desc ]]; then fail M6 "listing.json has no description"
+  elif ((${#desc} > 200)); then fail M6 "description is ${#desc} characters; keep it to one or two sentences (200 max)"
+  else review M6 "description reads well on its own: \"$desc\""; fi
+  [[ -n $(jq -r '.maintainerNotes // empty' "$listing") ]] && pass M7 "maintainer notes present" || fail M7 "listing.json has no maintainerNotes"
+fi
+
+echo
+echo "Security baseline (what the marketplace scanner will see)"
+hits=$(grep_plugin 'NOPASSWD|/etc/sudoers|/tmp/[^ ]*\.pid')
+[[ -z $hits ]] && pass S1 "no blocking patterns (sudoers, privileged control from /tmp)" || { fail S1 "blocking patterns:"; detail $hits; }
+
+caps=""
+grep_plugin '\b(sudo|pkexec|doas)\b' >/dev/null && caps+=" privilege"
+grep_plugin '\bsystemctl\b|\bservice (start|stop|restart)' >/dev/null && caps+=" service-management"
+grep_plugin '\b(pacman|yay|paru) +-S|\bnpm (i|install) +-g|\bpipx? install|\bcargo install|\bmise (use|install)|omarchy-install|omarchy pkg' >/dev/null && caps+=" package-manager/installer"
+grep_plugin '\bgit clone\b|\bcargo build\b|\bmake install\b' >/dev/null && caps+=" remote-build"
+bins=$(cd "$plugin" && git ls-files | while read -r f; do file -b "$f" | grep -q 'ELF' && echo "$f"; done)
+[[ -n $bins ]] && caps+=" bundled-executable-binary"
+if [[ -z $caps ]]; then pass S2 "no scanner capabilities: expect automatic verification"
+else
+  review S2 "scanner may flag:$caps (maintainer review, not a block); explain in maintainerNotes"
+  grep_plugin '\b(sudo|pkexec|doas|systemctl)\b|\bmise (use|install)|omarchy-install|omarchy pkg|\bgit clone\b' | head -8 | while read -r l; do detail "$l"; done
+fi
+
+hits=$(grep_plugin '(curl|wget)[^|]*\|[[:space:]]*(ba|z)?sh')
+[[ -z $hits ]] && pass S3 "no download piped to a shell" || { fail S3 "download piped to a shell:"; detail $hits; }
+
+echo
+echo "Consent and behavior"
+writes=$(grep_plugin 'omarchy bar (move|put|set)|omarchy plugin (enable|disable)|omarchy default agent|shell\.json|bindings\.lua|hl\.bind|o\.bind\(')
+if [[ -z $writes ]]; then pass C1 "no writes to user configuration"
+else
+  review C1 "each of these must run only after an explicit user action:"
+  while IFS= read -r l; do detail "$l"; done <<<"$writes"
+fi
+runs=$(grep_plugin '(--version|--help)\b' | grep -vE '^\S+:[0-9]+:\s*#')
+[[ -z $runs ]] && pass C2 "no agent binaries run to inspect them" || { review C2 "binaries run to inspect them:"; while IFS= read -r l; do detail "$l"; done <<<"$runs"; }
+if grep_plugin 'permission-mode|approve-for-me|--yolo|--allow-all|auto-approve' >/dev/null; then
+  grep -qiE 'approval|unattended' "$plugin/README.md" && pass C3 "README states that agents start without approval prompts" || fail C3 "agents start without approval prompts, and the README does not say so"
+else
+  pass C3 "no approval-skipping flags"
+fi
+
+echo
+echo "Documentation"
+missing=""
+readme="$plugin/README.md"
+heading() { grep -qiE "^#{2,4} .*($1)" "$readme"; }
+heading 'requirement' || missing+=" requirements"
+heading 'install' || missing+=" install"
+heading 'remov|uninstall' || missing+=" remove"
+heading 'how it works' || missing+=" how-it-works"
+heading 'what it writes|files it|what it touches' || missing+=" what-it-writes"
+heading 'troubleshoot|something goes wrong|if .* wrong' || missing+=" troubleshooting"
+[[ -z $missing ]] && pass D1 "README has every required section" || fail D1 "README is missing sections:$missing"
+review D2 "removal instructions cover every file the plugin leaves behind"
+pt=$(cd "$plugin" && files | grep -E '\.(md|qml|sh|js|py)$|^bin/' | xargs -r grep -ciE '\b(não|você|também|então|para o|está)\b' 2>/dev/null | awk -F: '$2 > 0' )
+[[ -z $pt ]] && pass D3 "documentation and comments are in English" || { fail D3 "Portuguese found:"; detail $pt; }
+review D4 "third-party assets are credited with their license"
+
+echo
+echo "Hygiene"
+hits=$(grep_plugin '/data/|/home/[a-z]|\bhoveras\b|\bvcia\b')
+[[ -z $hits ]] && pass H1 "no personal data" || { fail H1 "personal data:"; while IFS= read -r l; do detail "$l"; done <<<"$hits"; }
+version=$(jq -r '.version' "$manifest")
+git -C "$plugin" rev-parse -q --verify "refs/tags/v$version" >/dev/null && pass H2 "tag v$version" || fail H2 "no git tag v$version for the manifest version"
+junk=$(git -C "$plugin" ls-files | grep -E '__pycache__|\.pyc$|~$|\.swp$|\.orig$')
+[[ -z $junk ]] && pass H3 "no tracked build junk" || { fail H3 "tracked junk:"; detail $junk; }
+
+echo
+echo "Result: $fails FAIL, $reviews REVIEW"
+exit "$fails"
