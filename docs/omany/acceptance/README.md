@@ -38,7 +38,44 @@ catches that kind of conflict.
 | Grok | 1 | accepted (unnamed-on-retry fixed in 0.9.0) |
 | OpenCode | 3 | opens; OpenCode itself stopped during its own startup (outside omany) |
 | LionTUI (LionLabs community) | 1 | accepted as a plain command; see docs/integrations/liontui.md |
+| agy (Antigravity) | 1 | accepted as a plain command, on 0.12.0; see the section below |
 | Gemini, Cursor Agent, Hermes, OMP, Pi, OpenClaw, Crush, Muse | 0 | supported, not tested yet |
+
+## 0.12.0 — agy (Antigravity), the first outside contribution
+
+Done in real use on 2026-09-27, on the same workstation, by then running Hyprland
+0.56.2, Herdr 0.9.1 and agy 1.2.11 installed through mise
+(`aqua:google-antigravity/antigravity-cli`). Same test rule: the operator clicks and
+presses the key, the assistant confirms through the log and Herdr's state.
+
+agy arrived through pull request #1, from an outside contributor, who reported having
+tested it. This record is our own run, not theirs.
+
+| Step | Result |
+|---|---|
+| agy appears in all four slot pickers in the panel | accepted (4 of 4) |
+| `omany-state` reports agy as `installed`, without running the binary | accepted |
+| Slot X set to agy through the panel | accepted |
+| Super+Ctrl+Shift+X opens agy in a Herdr tab, as a plain command | accepted |
+| The panel lists the running agy with Focus | accepted (one pane, idle) |
+
+The log for the accepted launch:
+
+```
+agent=agy kind=plain ws=<workspace> tab=<workspace>:t5 pane=<workspace>:p5
+ok: agy in <workspace>:p5 (plain command: agy)
+```
+
+### Found here: a saved slot can outlive the agent it names
+
+Before the slot was changed, Super+Ctrl+Shift+X still carried `lion`, saved while an
+earlier version offered it. 0.11.2 had removed that agent, so the key answered
+`ERROR: omany does not know how to start lion` and opened nothing.
+
+The behaviour is correct (a clear message in the log, no crash, nothing launched), and
+it is worth stating: removing an agent from the manifest does not clear a slot a user
+already saved, and the user only finds out when the key is pressed. Whoever drops an
+agent from a future version should say so in the release notes.
 
 ## Problems found and fixed along the way
 
