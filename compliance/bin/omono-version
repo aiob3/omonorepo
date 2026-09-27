@@ -1,0 +1,77 @@
+#!/bin/bash
+# omono-version <plugin-dir> <base-ref> [head-ref]: decide whether a change needs a
+# new manifest version, and which one. Prints shell assignments (eval-friendly) and
+# a human line on stderr. Exit status: 0 nothing to do or already bumped, 1 a bump
+# is missing.
+#
+# Why this exists: rule H2 only asks whether a tag exists for the version currently
+# in the manifest. A change that ships code without touching the version therefore
+# passes: the old version and its old tag are both still there. That is how agy
+# (pull request #1 on omany) reached main at 0.11.2, the exact version the
+# marketplace had already validated, leaving the listing with no way to see it.
+
+set -uo pipefail
+
+plugin=$(readlink -f "${1:?usage: omono-version <plugin-dir> <base-ref> [head-ref]}")
+base="${2:?usage: omono-version <plugin-dir> <base-ref> [head-ref]}"
+head="${3:-HEAD}"
+manifest="$plugin/manifest.json"
+[[ -f $manifest ]] || { echo "omono-version: no manifest.json in $plugin" >&2; exit 2; }
+
+git_p() { git -C "$plugin" "$@"; }
+
+# What reaches the user's machine. Documentation, CI and the license do not change
+# what the plugin does, so they never force a version.
+shipped_re='^(manifest\.json$|bin/|assets/|.*\.qml$)'
+
+changed=$(git_p diff --name-only "$base..$head" -- . | grep -E "$shipped_re")
+# Read the version at head-ref, not the working tree: they differ when this runs
+# against two past commits.
+version_now=$(git_p show "$head:manifest.json" 2>/dev/null | jq -r '.version' 2>/dev/null)
+[[ -z $version_now || $version_now == null ]] && version_now=$(jq -r '.version' "$manifest")
+version_base=$(git_p show "$base:manifest.json" 2>/dev/null | jq -r '.version' 2>/dev/null)
+
+# Conventional Commits, the convention the contributions already arrive in
+# (`feat(agents): support agy`). Anything unlabelled is treated as a patch.
+subjects=$(git_p log --format='%s%n%b' "$base..$head")
+level=patch
+grep -qiE '^[a-z]+(\([^)]*\))?!:|BREAKING[ -]CHANGE' <<<"$subjects" && level=major
+[[ $level == patch ]] && grep -qiE '^feat(\([^)]*\))?:' <<<"$subjects" && level=minor
+
+IFS=. read -r ma mi pa <<<"${version_base:-0.0.0}"
+case $level in
+  major) next="$((ma + 1)).0.0" ;;
+  minor) next="$ma.$((mi + 1)).0" ;;
+  *)     next="$ma.$mi.$((pa + 1))" ;;
+esac
+
+printf 'OMONO_SHIPPED_CHANGED=%s\n' "$([[ -n $changed ]] && echo true || echo false)"
+printf 'OMONO_VERSION_BASE=%s\n' "$version_base"
+printf 'OMONO_VERSION_NOW=%s\n' "$version_now"
+printf 'OMONO_LEVEL=%s\n' "$level"
+printf 'OMONO_SUGGESTED=%s\n' "$next"
+
+if [[ -z $changed ]]; then
+  echo "omono-version: nothing that ships changed; no new version needed." >&2
+  exit 0
+fi
+
+if [[ $version_now != "$version_base" ]]; then
+  # A tag for this version is fine when it is this very commit (the release was
+  # already cut). It is a mistake when it points somewhere else: the version would
+  # be reused for different code.
+  if tagged=$(git_p rev-list -n1 "v$version_now" 2>/dev/null) &&
+     [[ $tagged != $(git_p rev-parse "$head") ]]; then
+    echo "omono-version: v$version_now already tags ${tagged:0:7}; pick an unused version." >&2
+    exit 1
+  fi
+  echo "omono-version: version moved $version_base -> $version_now." >&2
+  exit 0
+fi
+
+{
+  echo "omono-version: these files ship, and the version did not move:"
+  sed 's/^/  /' <<<"$changed"
+  echo "  set \"version\": \"$next\" in manifest.json ($level change)."
+} >&2
+exit 1

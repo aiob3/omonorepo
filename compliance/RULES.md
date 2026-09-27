@@ -62,6 +62,28 @@ maintainer must review it. Two rules block publication outright.
 | H1 | No personal data: local paths under `/data` or `/home`, host names, user names | [ours] | auto |
 | H2 | A git tag `v<manifest version>` exists for the version being published | [top] | auto |
 | H3 | No tracked build junk (`__pycache__`, `*.pyc`, editor backups) | [ours] | auto |
+| H4 | A change that ships (`manifest.json`, `bin/`, `assets/`, `*.qml`) moves the manifest version in the same pull request. H2 alone does not catch this: it only asks whether a tag exists for the version already in the manifest, so code merged without a bump keeps passing on the old version and its old tag | [ours] (agy reached omany's main at 0.11.2, the version the marketplace had already validated, so the listing could not see the update) | auto (`omono-version`, in the `version guard` workflow) |
+
+## Releasing
+
+The version is the only thing the marketplace uses to tell one snapshot from
+another, and a listing is bound to one exact commit. Two automated steps keep that
+honest, and neither of them publishes anything on its own:
+
+1. **`version guard`** runs on every pull request, including from forks. It fails
+   when something that ships changed and `manifest.json` kept its version, and it
+   prints the version to use. The level comes from Conventional Commits, the form
+   contributions already arrive in: `feat` is a minor bump, a `!` or
+   `BREAKING CHANGE` is major, anything else is a patch.
+2. **`release`** is a button a maintainer presses (`workflow_dispatch`). It reruns
+   the compliance rules, creates the `v<version>` tag H2 asks for, and prints a
+   marketplace update link with the action, plugin ID, repository and exact commit
+   already filled in.
+
+Opening the marketplace request stays a person's click. Outward actions need the
+operator's explicit go each time, and the exact commit deserves one last look
+before it becomes a public snapshot. Automation removes the typing, not the
+decision.
 
 ## Known Omarchy shell traps (build time)
 
